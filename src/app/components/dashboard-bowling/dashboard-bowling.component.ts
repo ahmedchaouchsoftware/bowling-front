@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {BowlingService} from '../../services/bowling.service';
 
 @Component({
   selector: 'app-dashboard-bowling',
@@ -7,9 +8,28 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardBowlingComponent implements OnInit {
 
-  constructor() { }
+  @ViewChild('alert', {static: true}) alert: ElementRef;
+  @Input() rounds: number[] = [];
+  frameScore: number;
+  errorMessages: string[] = [];
+
+  constructor(private bowlingService: BowlingService) {
+  }
 
   ngOnInit(): void {
+  }
+
+  calculateScoreFrame(frameNumber: number) {
+    this.bowlingService.intermediateScore(frameNumber, this.rounds)
+      .subscribe(result => {
+        this.frameScore = result;
+      }, error => {
+        this.errorMessages.push(error.error);
+      });
+  }
+
+  closeAlert() {
+    this.alert.nativeElement.classList.remove('show');
   }
 
 }
